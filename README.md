@@ -1,1 +1,1 @@
-# COMP-472-Projecy
+# COMP-472-Project

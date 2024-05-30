@@ -3,9 +3,10 @@ import os
 
 
 def resize_image(image_path, output_path, size=(128, 128)):
-    """Resizes an image to the specified size."""
+    """Resizes an image to the specified size and converts it to grayscale."""
     with Image.open(image_path) as img:
         img = img.resize(size)
+        img = img.convert("L")  # Convert to grayscale
         img.save(output_path)
 
 
@@ -40,7 +41,7 @@ def process_images(input_folder, output_folder, size=(128, 128)):
 
 
 if __name__ == "__main__":
-    input_folder = "data"
-    output_folder = "processed_data"
+    input_folder = "data/train"
+    output_folder = "processed_data/train"
 
     process_images(input_folder, output_folder)

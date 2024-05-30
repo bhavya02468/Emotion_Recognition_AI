@@ -1,0 +1,48 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+
+def get_sample_pixel_intensity(data_folder, samples_per_class=5):
+    sample_intensities = {}
+    for class_folder in os.listdir(data_folder):
+        class_path = os.path.join(data_folder, class_folder)
+        if os.path.isdir(class_path):
+            pixel_intensities = []
+            image_files = [
+                f
+                for f in os.listdir(class_path)
+                if f.endswith(".jpg") or f.endswith(".png")
+            ][:samples_per_class]
+            for filename in image_files:
+                image_path = os.path.join(class_path, filename)
+                with Image.open(image_path) as img:
+                    img = img.convert("L")  # Ensure the image is in grayscale
+                    pixel_intensities.append(np.array(img).flatten())
+            sample_intensities[class_folder] = pixel_intensities
+    return sample_intensities
+
+
+def plot_sample_pixel_intensity(sample_intensities):
+    plt.figure(figsize=(12, 8))
+    for class_name, intensity_list in sample_intensities.items():
+        for intensities in intensity_list:
+            plt.hist(
+                intensities,
+                bins=256,
+                alpha=0.5,
+                label=f"{class_name} sample",
+                density=True,
+            )
+    plt.xlabel("Pixel Intensity")
+    plt.ylabel("Frequency")
+    plt.title("Pixel Intensity Distribution for Sample Images")
+    plt.legend()
+    plt.show()
+
+
+if __name__ == "__main__":
+    data_folder = "data/train"  # Use the folder where your processed images are stored
+    sample_intensities = get_sample_pixel_intensity(data_folder)
+    plot_sample_pixel_intensity(sample_intensities)

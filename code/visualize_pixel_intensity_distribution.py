@@ -20,18 +20,28 @@ def get_pixel_intensity_distribution(data_folder):
     return class_intensity_distributions
 
 
-def plot_pixel_intensity_distribution(class_intensity_distributions):
-    plt.figure(figsize=(12, 8))
-    for class_name, intensities in class_intensity_distributions.items():
-        plt.hist(intensities, bins=256, alpha=0.5, label=class_name, density=True)
-    plt.xlabel("Pixel Intensity")
-    plt.ylabel("Frequency")
-    plt.title("Pixel Intensity Distribution per Class")
-    plt.legend()
+def plot_pixel_intensity_distribution_side_by_side(class_intensity_distributions):
+    num_classes = len(class_intensity_distributions)
+    fig, axes = plt.subplots(1, num_classes, figsize=(5 * num_classes, 5), sharey=True)
+
+    if num_classes == 1:
+        axes = [axes]  # Make axes iterable if only one class
+
+    for ax, (class_name, intensities) in zip(
+        axes, class_intensity_distributions.items()
+    ):
+        ax.hist(intensities, bins=256, alpha=0.75, density=True)
+        ax.set_xlabel("Pixel Intensity")
+        ax.set_ylabel("Frequency")
+        ax.set_title(f"Pixel Intensity Distribution - {class_name}")
+
+    plt.tight_layout()
     plt.show()
 
 
 if __name__ == "__main__":
-    data_folder = "data/train"  # Use the folder where your processed images are stored
+    data_folder = (
+        "processed_data/train"  # Use the folder where your processed images are stored
+    )
     class_intensity_distributions = get_pixel_intensity_distribution(data_folder)
-    plot_pixel_intensity_distribution(class_intensity_distributions)
+    plot_pixel_intensity_distribution_side_by_side(class_intensity_distributions)

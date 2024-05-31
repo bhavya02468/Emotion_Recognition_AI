@@ -32,6 +32,8 @@ def plot_class_distribution(class_counts):
 
 
 if __name__ == "__main__":
-    data_folder = "data/train"  # Use the folder where your processed images are stored
+    data_folder = (
+        "processed_data/train"  # Use the folder where your processed images are stored
+    )
     class_counts = count_images_in_classes(data_folder)
     plot_class_distribution(class_counts)

@@ -4,13 +4,14 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-def show_sample_images(data_folder, samples_per_class=5):
+def show_sample_images_side_by_side(data_folder, samples_per_class=5):
     classes = [
         d
         for d in os.listdir(data_folder)
         if os.path.isdir(os.path.join(data_folder, d))
     ]
-    plt.figure(figsize=(15, 10))
+    num_classes = len(classes)
+    plt.figure(figsize=(15, num_classes * 2))
 
     for i, class_name in enumerate(classes):
         class_path = os.path.join(data_folder, class_name)
@@ -28,17 +29,29 @@ def show_sample_images(data_folder, samples_per_class=5):
             image_path = os.path.join(class_path, image_file)
             with Image.open(image_path) as img:
                 plt.subplot(
-                    len(classes), samples_per_class, i * samples_per_class + j + 1
+                    num_classes, samples_per_class, i * samples_per_class + j + 1
                 )
                 plt.imshow(img, cmap="gray")
                 plt.axis("off")
                 if j == 0:
-                    plt.ylabel(class_name, rotation=90, size="large")
+                    plt.text(
+                        -20,
+                        img.size[1] // 2,
+                        class_name,
+                        va="center",
+                        ha="right",
+                        size="large",
+                        rotation=90,
+                    )
 
-    plt.tight_layout()
+    plt.tight_layout(
+        rect=[0.1, 0, 1, 1]
+    )  # Adjust the rectangle parameter to make space for labels
     plt.show()
 
 
 if __name__ == "__main__":
-    data_folder = "data/train"  # Use the folder where your processed images are stored
-    show_sample_images(data_folder)
+    data_folder = (
+        "processed_data/train"  # Use the folder where your processed images are stored
+    )
+    show_sample_images_side_by_side(data_folder, samples_per_class=5)

@@ -24,6 +24,10 @@ def get_sample_pixel_intensity(data_folder, samples_per_class=5):
     return sample_intensities
 
 
+
+
+
+
 def plot_sample_pixel_intensity(sample_intensities):
     num_classes = len(sample_intensities)
     samples_per_class = len(next(iter(sample_intensities.values())))
@@ -37,13 +41,14 @@ def plot_sample_pixel_intensity(sample_intensities):
             plt.ylabel("Frequency")
             plt.title(f"{class_name} Sample {j + 1}")
 
+
     plt.tight_layout()
     plt.show()
 
 
 if __name__ == "__main__":
     data_folder = (
-        "processed_data/train"  # Use the folder where your processed images are stored
+        "../processed_data/train"  # Use the folder where your processed images are stored
     )
     sample_intensities = get_sample_pixel_intensity(data_folder)
     plot_sample_pixel_intensity(sample_intensities)

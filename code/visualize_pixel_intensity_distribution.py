@@ -41,7 +41,7 @@ def plot_pixel_intensity_distribution_side_by_side(class_intensity_distributions
 
 if __name__ == "__main__":
     data_folder = (
-        "processed_data/train"  # Use the folder where your processed images are stored
+        "../processed_data/train"  # Use the folder where your processed images are stored
     )
     class_intensity_distributions = get_pixel_intensity_distribution(data_folder)
     plot_pixel_intensity_distribution_side_by_side(class_intensity_distributions)

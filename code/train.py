@@ -6,23 +6,25 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from model import CNNModel
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # Hyperparameters
-num_epochs = 30  # Increased number of epochs
-learning_rate = 0.0001  # Experiment with a lower learning rate
-batch_size = 32
+num_epochs = 50
+learning_rate = 0.00001
+batch_size = 64
 
 # Check for CUDA
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}')
 
-# Data loaders with enhanced augmentation
+# Data loaders with advanced augmentation
 train_transform = transforms.Compose([
-    transforms.Resize((96, 96)),  # Resize training images to 96x96
+    transforms.Grayscale(num_output_channels=1),  # Ensure images are single-channel
+    transforms.Resize((48, 48)),
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
-    transforms.RandomResizedCrop(96, scale=(0.8, 1.0)),  # Random resized crop
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),  # Color jitter
+    transforms.RandomResizedCrop(48, scale=(0.8, 1.0)),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
     transforms.ToTensor(),
 ])
 
@@ -41,7 +43,7 @@ criterion = nn.CrossEntropyLoss(weight=class_weights)
 # Initialize model and optimizer
 model = CNNModel().to(device)
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)  # Learning rate scheduler
+scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.1, patience=5, verbose=True)
 
 # Training loop
 for epoch in range(num_epochs):
@@ -50,7 +52,7 @@ for epoch in range(num_epochs):
     correct = 0
     total = 0
     for images, labels in train_loader:
-        images, labels = images.to(device), labels.to(device)  # Move data to GPU
+        images, labels = images.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = model(images)
         loss = criterion(outputs, labels)
@@ -67,7 +69,7 @@ for epoch in range(num_epochs):
     epoch_accuracy = correct / total
 
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}')
-    scheduler.step()  # Step the scheduler
+    scheduler.step(epoch_loss)
 
 # Save the model
 model_path = 'cnn_model.pth'

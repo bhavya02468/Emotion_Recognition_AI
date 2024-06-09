@@ -41,7 +41,7 @@ def process_images(input_folder, output_folder, size=(48, 48)):
 
 
 if __name__ == "__main__":
-    input_folder = "../data/test"
-    output_folder = "../processed_data/test"
+    input_folder = "../data/train"
+    output_folder = "../processed_data/train"
 
     process_images(input_folder, output_folder)

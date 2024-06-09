@@ -19,9 +19,9 @@ model.load_state_dict(torch.load('cnn_model.pth'))
 model.to(device)
 model.eval()
 
-# Data loader
+# Data loader for grayscale images
 test_transform = transforms.Compose([
-    transforms.Resize((48, 48)),  # Resize testing images to 48x48
+    transforms.Grayscale(num_output_channels=1),  # Ensure images are single-channel
     transforms.ToTensor(),
 ])
 
@@ -33,7 +33,7 @@ all_preds = []
 all_labels = []
 with torch.no_grad():
     for images, labels in test_loader:
-        images, labels = images.to(device), labels.to(device)  # Move data to GPU
+        images, labels = images.to(device), labels.to(device)
         outputs = model(images)
         _, predicted = torch.max(outputs, 1)
         all_preds.append(predicted.item())

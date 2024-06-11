@@ -28,7 +28,7 @@ train_transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-train_dataset = datasets.ImageFolder(root='../processed_data/train', transform=train_transform)
+train_dataset = datasets.ImageFolder(root='processed_data/train', transform=train_transform)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 # Calculate class weights

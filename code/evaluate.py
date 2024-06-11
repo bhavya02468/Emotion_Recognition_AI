@@ -22,10 +22,12 @@ model.eval()
 # Data loader for grayscale images
 test_transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=1),  # Ensure images are single-channel
+    transforms.Resize((48, 48)),
     transforms.ToTensor(),
 ])
+# The transform is the same as the training one with the exception of data augmentation. RandomHorizontalFlip(), RandomRotation(), RandomResizedCrop(), ColorJitter() are not used
 
-test_dataset = datasets.ImageFolder(root='../processed_data/test', transform=test_transform)
+test_dataset = datasets.ImageFolder(root='data/test', transform=test_transform)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 # Evaluate the model

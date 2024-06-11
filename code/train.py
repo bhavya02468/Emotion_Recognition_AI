@@ -9,9 +9,9 @@ from model import CNNModel
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # Hyperparameters
-num_epochs = 50
-learning_rate = 0.00001
-batch_size = 64
+num_epochs = 100
+learning_rate = 0.001
+batch_size = 128
 
 # Check for CUDA
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -28,7 +28,7 @@ train_transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-train_dataset = datasets.ImageFolder(root='processed_data/train', transform=train_transform)
+train_dataset = datasets.ImageFolder(root='data/train', transform=train_transform)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 # Calculate class weights
@@ -59,17 +59,27 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         running_loss += loss.item() * images.size(0)
-        
-        # Calculate accuracy
+
+    epoch_loss = running_loss / len(train_loader.dataset)
+
+    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}')
+    scheduler.step(epoch_loss)
+
+# Calculate accuracy at the last epoch
+model.eval()
+correct = 0
+total = 0
+with torch.no_grad():
+    for images, labels in train_loader:
+        images = images.to(device)
+        labels = labels.to(device)
+        outputs = model(images)
         _, predicted = torch.max(outputs, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-    epoch_loss = running_loss / len(train_loader.dataset)
-    epoch_accuracy = correct / total
-
-    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.4f}')
-    scheduler.step(epoch_loss)
+epoch_accuracy = correct / total
+print(f'Final Epoch Accuracy: {epoch_accuracy:.4f}')
 
 # Save the model
 model_path = 'cnn_model.pth'

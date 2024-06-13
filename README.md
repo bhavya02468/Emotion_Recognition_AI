@@ -10,7 +10,7 @@ Project done for COMP 472: Artificial Intelligence in the Summer 2024 semester
 
 | Name               | Student ID |
 | ------------------ | ---------- |
-|   Mehdi Chitsaz    |  40132819  |
+|   Daniel Secelean    |  40227919  |
 |||
 |||
 |||

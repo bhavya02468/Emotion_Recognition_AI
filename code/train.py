@@ -10,7 +10,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 # Hyperparameters
 num_epochs = 50
-learning_rate = 0.00001
+learning_rate = 0.001
 batch_size = 64
 
 # Check for CUDA

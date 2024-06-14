@@ -7,27 +7,25 @@ from sklearn.metrics import confusion_matrix, classification_report, accuracy_sc
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from model import CNNModel
+from model import DeeperCNN
 
 # Check for CUDA
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}')
 
 # Load the trained model
-model = CNNModel()
+model = DeeperCNN()
 model.load_state_dict(torch.load('cnn_model.pth'))
 model.to(device)
 model.eval()
 
 # Data loader for grayscale images
 test_transform = transforms.Compose([
-    transforms.Grayscale(num_output_channels=1),  # Ensure images are single-channel
-    transforms.Resize((48, 48)),
+    transforms.Grayscale(num_output_channels=1),
     transforms.ToTensor(),
 ])
-# The transform is the same as the training one with the exception of data augmentation. RandomHorizontalFlip(), RandomRotation(), RandomResizedCrop(), ColorJitter() are not used
 
-test_dataset = datasets.ImageFolder(root='data/test', transform=test_transform)
+test_dataset = datasets.ImageFolder(root='../processed_data/test', transform=test_transform)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 # Evaluate the model

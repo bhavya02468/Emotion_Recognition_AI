@@ -7,15 +7,32 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
-from model import DeeperCNN
+from model import MainCNN, Variant1CNN, Variant2CNN
 
 # Check for CUDA
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Using device: {device}')
 
 # Load the trained model
-model = DeeperCNN()
-model.load_state_dict(torch.load('best_cnn_model.pth'))
+print("Select the model to evaluate:")
+print("1: MainCNN (Main Model)")
+print("2: Variant1CNN (Additional Conv Layer)")
+print("3: Variant2CNN (Different Kernel Sizes)")
+choice = input("Enter 1, 2, or 3: ")
+
+if choice == '1':
+    model = MainCNN()
+    model_name = "MainCNN"
+elif choice == '2':
+    model = Variant1CNN()
+    model_name = "Variant1CNN"
+elif choice == '3':
+    model = Variant2CNN()
+    model_name = "Variant2CNN"
+else:
+    raise ValueError("Invalid choice. Please enter 1, 2, or 3.")
+
+model.load_state_dict(torch.load(f'best_{model_name}_Model.pth'))
 model.to(device)
 model.eval()
 
@@ -47,7 +64,7 @@ print('Confusion Matrix')
 print(cm)
 
 print('Classification Report')
-print(classification_report(all_labels, all_preds, target_names=test_dataset.classes))
+print(classification_report(all_labels, all_preds, target_names=test_dataset.classes, zero_division=0))
 print(f'Accuracy: {accuracy:.4f}')
 
 # Plot confusion matrix
@@ -60,7 +77,12 @@ plt.show()
 
 # Evaluate the model on a single image
 def evaluate_single_image(image_path):
-    image = Image.open(image_path).convert("L")
+    try:
+        image = Image.open(image_path).convert("L")
+    except FileNotFoundError:
+        print(f"File not found: {image_path}")
+        return None
+
     image = test_transform(image).unsqueeze(0).to(device)
     model.eval()
     with torch.no_grad():
@@ -69,6 +91,7 @@ def evaluate_single_image(image_path):
     return predicted.item()
 
 # Example usage
-image_path = '../processed_data/test/angry/123.jpg'
-predicted_class = evaluate_single_image(image_path)
-print(f'Predicted class for {image_path}: {test_dataset.classes[predicted_class]}')
+# image_path = '../processed_data/test/angry/123.jpg'  # Ensure this path is correct
+# predicted_class = evaluate_single_image(image_path)
+# if predicted_class is not None:
+#     print(f'Predicted class for {image_path}: {test_dataset.classes[predicted_class]}')

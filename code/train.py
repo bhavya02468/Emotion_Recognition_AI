@@ -5,14 +5,14 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, random_split
-from model import DeeperCNN, FocalLoss
+from model import MainCNN, Variant1CNN, Variant2CNN, FocalLoss
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
 
 # Hyperparameters
 num_epochs = 100
-learning_rate = 0.001  # Reduced learning rate
-batch_size = 32
+learning_rate = 0.01  # Reduced learning rate
+batch_size = 64
 momentum = 0.9
 weight_decay = 1e-4
 val_split = 0.2  # Validation split ratio (20%)
@@ -55,10 +55,30 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 # Initialize Focal Loss
 criterion = FocalLoss(alpha=1, gamma=2, reduction='mean').to(device)
 
-# Initialize model and optimizer
-model = DeeperCNN().to(device)
+# Prompt for model selection
+print("Select the model to train:")
+print("1: MainCNN (Main Model)")
+print("2: Variant1CNN (Additional Conv Layer)")
+print("3: Variant2CNN (Different Kernel Sizes)")
+choice = input("Enter 1, 2, or 3: ")
+
+if choice == '1':
+    model = MainCNN().to(device)
+    model_name = "MainCNN"
+elif choice == '2':
+    model = Variant1CNN().to(device)
+    model_name = "Variant1CNN"
+elif choice == '3':
+    model = Variant2CNN().to(device)
+    model_name = "Variant2CNN"
+else:
+    raise ValueError("Invalid choice. Please enter 1, 2, or 3.")
+
+print(f'Training {model_name}...')
+
+# Initialize optimizer and scheduler
 optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
-scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.1, patience=5, verbose=True)
+scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.1, patience=5)
 
 best_val_loss = float('inf')
 early_stopping_counter = 0
@@ -110,7 +130,7 @@ for epoch in range(num_epochs):
     # Save the best model
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        torch.save(model.state_dict(), 'best_cnn_model.pth')
+        torch.save(model.state_dict(), f'best_{model_name}_Model.pth')
         print('Best model saved!')
         early_stopping_counter = 0
     else:
@@ -122,5 +142,5 @@ for epoch in range(num_epochs):
         break
 
 # Save the final model
-torch.save(model.state_dict(), 'final_cnn_model.pth')
+torch.save(model.state_dict(), f'final_{model_name}_Model.pth')
 print('Final model saved!')

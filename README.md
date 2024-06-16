@@ -21,7 +21,7 @@ Project done for COMP 472: Artificial Intelligence in the Summer 2024 semester
 - The dataset has two folders: Training and Testing
 - Each folder has 4 classes (Neutral, Focused, Angry and Happy). The training folder has minimum of 400 images in each one of its classes, while the testing folder has minimum of 100 images in each one of its classes
 
-- Link to the dataset : re
+- Link to the dataset :
 https://www.kaggle.com/datasets/astraszab/facial-expression-dataset-image-folders-fer2013/data 
 https://www.kaggle.com/datasets/noamsegal/affectnet-training-data/data
 https://www.kaggle.com/datasets/mahmoudima/mma-facial-expression/data
@@ -32,8 +32,9 @@ https://www.kaggle.com/datasets/mahmoudima/mma-facial-expression/data
 - Install the libraries by doing 'pip install -r Requirements.txt'
 - Create a virual environment by running
   `$ python -m venv "environment name"`
-- Run the train.py script to train the model by using `python train.py`. You will be prompted to select the model to train:
+check dataset folder for your device before running it should be either `data/train` or `../data/train` for and `data/test` or `../data/test` in files train.py and evaluate.py depending on your operating system.
 
+- Run the train.py script to train the model by using `python train.py`. You will be prompted to select the model to train:
 Enter `1` for the main model (DeeperCNN).
 Enter `2` for Variant 1 (Variant1CNN).
 Enter `3` for Variant 2 (Variant2CNN).

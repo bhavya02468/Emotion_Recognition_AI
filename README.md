@@ -21,7 +21,7 @@ Project done for COMP 472: Artificial Intelligence in the Summer 2024 semester
 - The dataset has two folders: Training and Testing
 - Each folder has 4 classes (Neutral, Focused, Angry and Happy). The training folder has minimum of 400 images in each one of its classes, while the testing folder has minimum of 100 images in each one of its classes
 
-- Link to the dataset : 
+- Link to the dataset : re
 https://www.kaggle.com/datasets/astraszab/facial-expression-dataset-image-folders-fer2013/data 
 https://www.kaggle.com/datasets/noamsegal/affectnet-training-data/data
 https://www.kaggle.com/datasets/mahmoudima/mma-facial-expression/data

@@ -32,7 +32,7 @@ https://www.kaggle.com/datasets/mahmoudima/mma-facial-expression/data
 - Install the libraries by doing 'pip install -r Requirements.txt'
 - Create a virual environment by running
   `$ python -m venv "environment name"`
--check dataset folder for your device before running it should be either `data/train` or `../data/train` for and `data/test` or `../data/test` in files train.py and evaluate.py depending on your operating system.
+- check dataset folder for your device before running it should be either `data/train` or `../data/train` for and `data/test` or `../data/test` in files train.py and evaluate.py depending on your operating system.
 
 - Run the train.py script to train the model by using `python train.py`. You will be prompted to select the model to train:
 Enter `1` for the main model (DeeperCNN).

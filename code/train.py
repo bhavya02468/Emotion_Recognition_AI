@@ -41,7 +41,7 @@ val_transform = transforms.Compose([
 ])
 
 # Load the dataset and split it
-full_dataset = datasets.ImageFolder(root='../processed_data/train', transform=train_transform)
+full_dataset = datasets.ImageFolder(root='data/train', transform=train_transform)
 val_size = int(len(full_dataset) * val_split)
 train_size = len(full_dataset) - val_size
 train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
@@ -53,7 +53,7 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Initialize Focal Loss
-criterion = FocalLoss(alpha=1, gamma=2, reduction='mean').to(device)
+criterion = FocalLoss(alpha=0.25, gamma=2, reduction='mean').to(device)
 
 # Prompt for model selection
 print("Select the model to train:")

@@ -41,7 +41,7 @@ val_transform = transforms.Compose([
 ])
 
 # Load the dataset and split it
-full_dataset = datasets.ImageFolder(root='data/train', transform=train_transform)
+full_dataset = datasets.ImageFolder(root='../data/train', transform=train_transform)
 val_size = int(len(full_dataset) * val_split)
 train_size = len(full_dataset) - val_size
 train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])

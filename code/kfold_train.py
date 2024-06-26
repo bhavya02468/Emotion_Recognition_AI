@@ -4,9 +4,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader, Subset, random_split
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 from model import MainCNN, Variant1CNN, Variant2CNN, FocalLoss
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import numpy as np
@@ -73,8 +75,14 @@ def train_and_evaluate(train_idx, val_idx, fold):
     train_subset = Subset(full_dataset, train_idx)
     val_subset = Subset(full_dataset, val_idx)
 
+    # Splitting train_subset further into actual training set and validation set
+    train_size = int(len(train_subset) * 0.85)
+    val_size = len(train_subset) - train_size
+    train_subset, val_subset_extra = random_split(train_subset, [train_size, val_size])
+
     train_loader = DataLoader(train_subset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_subset, batch_size=batch_size, shuffle=False)
+    val_loader_extra = DataLoader(val_subset_extra, batch_size=batch_size, shuffle=False)
 
     # Initialize model and optimizer
     model = model_class().to(device)
@@ -205,3 +213,12 @@ print(f'Test Accuracy: {test_accuracy:.4f}')
 print(f'Test Precision: {test_precision:.4f}')
 print(f'Test Recall: {test_recall:.4f}')
 print(f'Test F1 Score: {test_f1:.4f}')
+
+# Confusion Matrix
+cm = confusion_matrix(all_test_labels, all_test_preds)
+plt.figure(figsize=(10, 8))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=test_dataset.classes, yticklabels=test_dataset.classes)
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()

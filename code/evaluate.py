@@ -1,4 +1,5 @@
 # project/code/evaluate.py
+import os
 import torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
@@ -43,7 +44,8 @@ test_transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-test_dataset = datasets.ImageFolder(root='../data/test', transform=test_transform)
+# Load test dataset
+test_dataset = datasets.ImageFolder(root='../biased_data/test', transform=test_transform)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 # Evaluate the model on the complete dataset
@@ -74,24 +76,3 @@ plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.title('Confusion Matrix')
 plt.show()
-
-# Evaluate the model on a single image
-def evaluate_single_image(image_path):
-    try:
-        image = Image.open(image_path).convert("L")
-    except FileNotFoundError:
-        print(f"File not found: {image_path}")
-        return None
-
-    image = test_transform(image).unsqueeze(0).to(device)
-    model.eval()
-    with torch.no_grad():
-        output = model(image)
-        _, predicted = torch.max(output, 1)
-    return predicted.item()
-
-# Example usage
-image_path = '../processed_data/test/angry/35665.png'  # Ensure this path is correct
-predicted_class = evaluate_single_image(image_path)
-if predicted_class is not None:
-    print(f'Predicted class for {image_path}: {test_dataset.classes[predicted_class]}')

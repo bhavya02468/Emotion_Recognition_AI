@@ -33,7 +33,7 @@ transform = transforms.Compose([
 ])
 
 # Load dataset
-full_dataset = datasets.ImageFolder(root='../biased_data/train', transform=transform)
+full_dataset = datasets.ImageFolder(root='data/train', transform=transform)
 
 # K-Fold Cross-Validation
 kf = KFold(n_splits=10, shuffle=True, random_state=42)
@@ -186,7 +186,7 @@ print(f'Average Recall: {avg_recall:.4f}')
 print(f'Average F1 Score: {avg_f1:.4f}')
 
 # Final testing phase
-test_dataset = datasets.ImageFolder(root='../biased_data/test', transform=transform)
+test_dataset = datasets.ImageFolder(root='data/test', transform=transform)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
 best_model = model_class().to(device)

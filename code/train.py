@@ -130,7 +130,7 @@ for epoch in range(num_epochs):
     # Save the best model
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        torch.save(model.state_dict(), f'best_{model_name}_Model.pth')
+        torch.save(model.state_dict(), f'best_{model_name}_Model.pth') # Change this to best_augmented_{model_name}_Model.pth when training the augmented model
         print('Best model saved!')
         early_stopping_counter = 0
     else:
@@ -142,5 +142,5 @@ for epoch in range(num_epochs):
         break
 
 # Save the final model
-torch.save(model.state_dict(), f'final_{model_name}_Model.pth')
+torch.save(model.state_dict(), f'final_{model_name}_Model.pth') # Change this to final_augmented_{model_name}_Model.pth when training the augmented model
 print('Final model saved!')

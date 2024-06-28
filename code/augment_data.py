@@ -4,8 +4,8 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch import autocast
-from diffusers import StableDiffusionPipeline 
-from model import MainCNN 
+from diffusers import StableDiffusionPipeline
+from model import MainCNN
 
 # Check for CUDA
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -25,9 +25,12 @@ transform = transforms.Compose([
 ])
 
 # Define root directories
-biased_data_male_root = 'biased_data_train/male'
-biased_data_female_root = 'biased_data_train/female'
-augmented_data_root = 'augmented_data'
+biased_data_root = '../biased_data/train'
+augmented_data_root = '../augmented_data'
+
+# Verify the root directory exists
+if not os.path.exists(biased_data_root):
+    raise FileNotFoundError(f"Source directory '{biased_data_root}' does not exist.")
 
 # Create folders for augmented data if they don't exist
 os.makedirs(augmented_data_root, exist_ok=True)
@@ -36,7 +39,7 @@ for emotion in ['angry', 'focused', 'happy', 'neutral']:
 
 # Function to generate synthetic data using Stable Diffusion
 def generate_synthetic_data_diffusion(dest_dir, gender):
-    num_images_per_class=1
+    num_images_per_class = 50
     pipeline = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-3", torch_dtype=torch.float16)
     pipeline = pipeline.to(device)
     
@@ -47,11 +50,11 @@ def generate_synthetic_data_diffusion(dest_dir, gender):
             prompt = f"The face of a {gender} with a {emotion} expression"
             with autocast("cuda"):
                 result = pipeline(prompt, guidance_scale=7.5)
-                if "images" in result:
-                    image = result["images"][0]  # Assuming only one image is generated
+                if hasattr(result, "images"):
+                    image = result.images[0]  # Assuming only one image is generated
                     image = image.convert("RGB")  # Convert image to RGB mode if necessary
                 else:
-                    raise KeyError(f"'images' key not found in result: {result}")
+                    raise KeyError(f"'images' attribute not found in result: {result}")
             
             # Transform image to match dataset expectations (grayscale, resize, tensor)
             image = transform(image)
@@ -64,39 +67,43 @@ def generate_synthetic_data_diffusion(dest_dir, gender):
     
     return synthetic_data
 
-# Function to copy data from source to destination
-def copy_data(source_dir, dest_dir):
+# Function to copy data from source to destination and mix old and new images
+def copy_and_mix_data(source_dir, dest_dir):
     for emotion in ['angry', 'focused', 'happy', 'neutral']:
         source_path = os.path.join(source_dir, emotion)
         dest_path = os.path.join(dest_dir, emotion)
         os.makedirs(dest_path, exist_ok=True)
-        for filename in os.listdir(source_path):
-            if filename.endswith('.jpg') or filename.endswith('.png'):
-                src_file = os.path.join(source_path, filename)
-                dst_file = os.path.join(dest_path, filename)
-                shutil.copyfile(src_file, dst_file)
+        if os.path.exists(source_path):
+            for gender in ['male', 'female']:
+                source_gender_path = os.path.join(source_path, gender)
+                if os.path.exists(source_gender_path):
+                    for filename in os.listdir(source_gender_path):
+                        if filename.endswith('.jpg') or filename.endswith('.png'):
+                            src_file = os.path.join(source_gender_path, filename)
+                            dst_file = os.path.join(dest_path, filename)
+                            shutil.copyfile(src_file, dst_file)
 
 # User input to select gender for augmentation
 selected_gender = input("Enter the gender to augment (male/female): ").strip().lower()
 
-# Determine source and destination directories based on user input
-if selected_gender == 'male':
-    source_dir = biased_data_male_root
-elif selected_gender == 'female':
-    source_dir = biased_data_female_root
-else:
-    raise ValueError("Invalid input. Please enter 'male' or 'female'.")
+# Determine source directories based on user input
+source_dir = biased_data_root
+other_gender = 'male' if selected_gender == 'female' else 'female'
 
-# Copy data for the non-selected gender
-if selected_gender == 'male':
-    copy_data(biased_data_female_root, augmented_data_root)
-else:
-    copy_data(biased_data_male_root, augmented_data_root)
+# Verify source directories exist
+for emotion in ['angry', 'focused', 'happy', 'neutral']:
+    source_gender_dir = os.path.join(source_dir, emotion, selected_gender)
+    if not os.path.exists(source_gender_dir):
+        raise FileNotFoundError(f"Source directory '{source_gender_dir}' does not exist.")
+    other_gender_dir = os.path.join(source_dir, emotion, other_gender)
+    if not os.path.exists(other_gender_dir):
+        raise FileNotFoundError(f"Source directory '{other_gender_dir}' does not exist.")
 
+# Copy data for both genders to augmented data root
+copy_and_mix_data(source_dir, augmented_data_root)
 
 # Generate synthetic data using Stable Diffusion
 synthetic_data = generate_synthetic_data_diffusion(augmented_data_root, selected_gender)
 
 print(f"Synthetic data saved to {augmented_data_root}.")
-
 print("Data augmentation and synthetic data generation completed.")

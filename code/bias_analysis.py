@@ -25,7 +25,7 @@ transform = transforms.Compose([
 ])
 
 # Load datasets for bias analysis
-biased_data_root = 'biased_data_test'
+biased_data_root = '../biased_data_test'
 
 male_dataset = datasets.ImageFolder(root=f'{biased_data_root}/male', transform=transform)
 female_dataset = datasets.ImageFolder(root=f'{biased_data_root}/female', transform=transform)

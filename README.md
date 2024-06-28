@@ -34,6 +34,15 @@ https://www.kaggle.com/datasets/mahmoudima/mma-facial-expression/data
   `$ python -m venv "environment name"`
 - check dataset folder for your device before running it should be either `data/train` or `../data/train` for and `data/test` or `../data/test` in files train.py and evaluate.py depending on your operating system.
 
+ - train the model(train.py)(data/train)
+- evaluate the model(evaluate.py)(data/test) performance graph
+- check the bias(bias_analysis.py)
+- run augmentation depending on the report(augment_data.py)
+- train the model again(train.py)(augmentated_data)
+- check the bias(bias_analysis.py)
+
+
+
 - Run the train.py script to train the model by using `python train.py`. You will be prompted to select the model to train:
 Enter `1` for the main model (DeeperCNN).
 Enter `2` for Variant 1 (Variant1CNN).

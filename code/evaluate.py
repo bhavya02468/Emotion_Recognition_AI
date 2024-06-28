@@ -45,7 +45,7 @@ test_transform = transforms.Compose([
 ])
 
 # Load test dataset
-test_dataset = datasets.ImageFolder(root='data/test', transform=test_transform)
+test_dataset = datasets.ImageFolder(root='../data/test', transform=test_transform)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
 
 # Evaluate the model on the complete dataset

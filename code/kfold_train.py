@@ -1,4 +1,3 @@
-# project/code/kfold_train.py
 import os
 import torch
 import torch.nn as nn
@@ -6,7 +5,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Subset, random_split
 from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from model import MainCNN, Variant1CNN, Variant2CNN, FocalLoss
@@ -33,7 +32,7 @@ transform = transforms.Compose([
 ])
 
 # Load dataset
-full_dataset = datasets.ImageFolder(root='data/train', transform=transform)
+full_dataset = datasets.ImageFolder(root='../data/train', transform=transform)
 
 # K-Fold Cross-Validation
 kf = KFold(n_splits=10, shuffle=True, random_state=42)
@@ -41,9 +40,12 @@ kf = KFold(n_splits=10, shuffle=True, random_state=42)
 # Placeholder for performance metrics
 fold_metrics = {
     'accuracy': [],
-    'precision': [],
-    'recall': [],
-    'f1': []
+    'macro_precision': [],
+    'macro_recall': [],
+    'macro_f1': [],
+    'micro_precision': [],
+    'micro_recall': [],
+    'micro_f1': []
 }
 
 # Initialize Focal Loss
@@ -159,15 +161,21 @@ def train_and_evaluate(train_idx, val_idx, fold):
 
     # Compute metrics
     accuracy = accuracy_score(all_labels, all_preds)
-    precision = precision_score(all_labels, all_preds, average='macro', zero_division=0)
-    recall = recall_score(all_labels, all_preds, average='macro', zero_division=0)
-    f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
+    macro_precision = precision_score(all_labels, all_preds, average='macro', zero_division=0)
+    macro_recall = recall_score(all_labels, all_preds, average='macro', zero_division=0)
+    macro_f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
+    micro_precision = precision_score(all_labels, all_preds, average='micro', zero_division=0)
+    micro_recall = recall_score(all_labels, all_preds, average='micro', zero_division=0)
+    micro_f1 = f1_score(all_labels, all_preds, average='micro', zero_division=0)
     
     fold_metrics['accuracy'].append(accuracy)
-    fold_metrics['precision'].append(precision)
-    fold_metrics['recall'].append(recall)
-    fold_metrics['f1'].append(f1)
-    print(f'Fold {fold} - Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}')
+    fold_metrics['macro_precision'].append(macro_precision)
+    fold_metrics['macro_recall'].append(macro_recall)
+    fold_metrics['macro_f1'].append(macro_f1)
+    fold_metrics['micro_precision'].append(micro_precision)
+    fold_metrics['micro_recall'].append(micro_recall)
+    fold_metrics['micro_f1'].append(micro_f1)
+    print(f'Fold {fold} - Accuracy: {accuracy:.4f}, Macro Precision: {macro_precision:.4f}, Macro Recall: {macro_recall:.4f}, Macro F1: {macro_f1:.4f}, Micro Precision: {micro_precision:.4f}, Micro Recall: {micro_recall:.4f}, Micro F1: {micro_f1:.4f}')
 
 # Perform k-fold cross-validation
 for fold, (train_idx, val_idx) in enumerate(kf.split(full_dataset)):
@@ -176,17 +184,23 @@ for fold, (train_idx, val_idx) in enumerate(kf.split(full_dataset)):
 
 # Average metrics across all folds
 avg_accuracy = np.mean(fold_metrics['accuracy'])
-avg_precision = np.mean(fold_metrics['precision'])
-avg_recall = np.mean(fold_metrics['recall'])
-avg_f1 = np.mean(fold_metrics['f1'])
+avg_macro_precision = np.mean(fold_metrics['macro_precision'])
+avg_macro_recall = np.mean(fold_metrics['macro_recall'])
+avg_macro_f1 = np.mean(fold_metrics['macro_f1'])
+avg_micro_precision = np.mean(fold_metrics['micro_precision'])
+avg_micro_recall = np.mean(fold_metrics['micro_recall'])
+avg_micro_f1 = np.mean(fold_metrics['micro_f1'])
 
 print(f'Average Accuracy: {avg_accuracy:.4f}')
-print(f'Average Precision: {avg_precision:.4f}')
-print(f'Average Recall: {avg_recall:.4f}')
-print(f'Average F1 Score: {avg_f1:.4f}')
+print(f'Average Macro Precision: {avg_macro_precision:.4f}')
+print(f'Average Macro Recall: {avg_macro_recall:.4f}')
+print(f'Average Macro F1 Score: {avg_macro_f1:.4f}')
+print(f'Average Micro Precision: {avg_micro_precision:.4f}')
+print(f'Average Micro Recall: {avg_micro_recall:.4f}')
+print(f'Average Micro F1 Score: {avg_micro_f1:.4f}')
 
 # Final testing phase
-test_dataset = datasets.ImageFolder(root='data/test', transform=transform)
+test_dataset = datasets.ImageFolder(root='../data/test', transform=transform)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
 best_model = model_class().to(device)
@@ -204,15 +218,21 @@ with torch.no_grad():
         all_test_labels.extend(labels.cpu().numpy())
 
 test_accuracy = accuracy_score(all_test_labels, all_test_preds)
-test_precision = precision_score(all_test_labels, all_test_preds, average='macro', zero_division=0)
-test_recall = recall_score(all_test_labels, all_test_preds, average='macro', zero_division=0)
-test_f1 = f1_score(all_test_labels, all_test_preds, average='macro', zero_division=0)
+test_macro_precision = precision_score(all_test_labels, all_test_preds, average='macro', zero_division=0)
+test_macro_recall = recall_score(all_test_labels, all_test_preds, average='macro', zero_division=0)
+test_macro_f1 = f1_score(all_test_labels, all_test_preds, average='macro', zero_division=0)
+test_micro_precision = precision_score(all_test_labels, all_test_preds, average='micro', zero_division=0)
+test_micro_recall = recall_score(all_test_labels, all_test_preds, average='micro', zero_division=0)
+test_micro_f1 = f1_score(all_test_labels, all_test_preds, average='micro', zero_division=0)
 
 print('Final Test Results:')
 print(f'Test Accuracy: {test_accuracy:.4f}')
-print(f'Test Precision: {test_precision:.4f}')
-print(f'Test Recall: {test_recall:.4f}')
-print(f'Test F1 Score: {test_f1:.4f}')
+print(f'Test Macro Precision: {test_macro_precision:.4f}')
+print(f'Test Macro Recall: {test_macro_recall:.4f}')
+print(f'Test Macro F1 Score: {test_macro_f1:.4f}')
+print(f'Test Micro Precision: {test_micro_precision:.4f}')
+print(f'Test Micro Recall: {test_micro_recall:.4f}')
+print(f'Test Micro F1 Score: {test_micro_f1:.4f}')
 
 # Confusion Matrix
 cm = confusion_matrix(all_test_labels, all_test_preds)
